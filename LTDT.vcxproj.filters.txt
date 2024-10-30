@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="graph.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="linked_list.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="header">
+      <UniqueIdentifier>{a9e72f85-34fa-4b33-9c2b-7b037586147d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{9860b172-086d-4335-85d0-d706c1e38e23}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="graph.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="linked_list.h">
+      <Filter>header</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
