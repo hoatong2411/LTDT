@@ -5,14 +5,26 @@ typedef struct Node {
 	Node* pNext;
 } Node;
 
-typedef struct List {
+typedef class List {
 	Node* head;
 	Node* tail;
-	int szList;
-} List;
+	int size;
+	friend class AdjencyList;
+public:
+	// Constructor and destructor
+	List() : head(NULL), tail(NULL), size(0) {};
+	~List();
 
-void freeList(List& lst);
-void initList(List& lst);
-Node* createNode(const int& data);
-bool insertHead(List& lst, const int& data);
-bool insertTail(List& lst, const int& data);
+	// Copy constructor
+	List(const List& l);
+
+	// Add node function
+	Node* createNode(const int& data);
+	void push_back(const int& data);
+	
+	Node* get_head() const;
+	int get_size() const;
+	// Temporary size decreasing and increasing Function
+	void decreaseSize();
+	void increaseSize();
+} List;

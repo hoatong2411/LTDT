@@ -1,27 +1,28 @@
 #include "linked_list.h"
 
-void freeList(List& lst)
-{
-	if (lst.head != NULL) {
-		Node* p = lst.head, * temp = NULL;
-		while (p != NULL) {
-			temp = p->pNext;
-			delete p;
-			p = temp;
-		}
-		lst.head = NULL;
-		lst.tail = NULL;
-		lst.szList = 0;
+// Destructor
+List::~List(){
+	// Delete Linked list
+	Node* cur = head;
+	while (cur != NULL) {
+		Node* next = cur->pNext;
+		delete cur;
+		cur = next;
+	}
+	head = tail = NULL;
+	size = 0;
+}
+
+// Copy constructor 
+List::List(const List& l) : head(NULL), tail(NULL), size(0) {
+	Node* p = l.head;
+	while (p != NULL) {
+		push_back(p->data);
+		p = p->pNext;
 	}
 }
 
-void initList(List& lst) {
-	lst.head = NULL;
-	lst.tail = NULL;
-	lst.szList = 0;
-}
-
-Node* createNode(const int& data) {
+Node* List::createNode(const int& data) {
 	// Create node
 	Node* p = new Node;
 	if (p == NULL)
@@ -31,38 +32,31 @@ Node* createNode(const int& data) {
 	return p;
 }
 
-bool insertHead(List& lst, const int& data)
+void List::push_back(const int& data)
 {
-	// Create node
 	Node* p = createNode(data);
-	if (p == NULL) {
-		return false;
-	}
-	// Modify list
-	if (lst.head == NULL) {
-		lst.head = lst.tail = p;
+	if (!head) {
+		head = tail = p;
 	}
 	else {
-		p->pNext = lst.head;
-		lst.head = p;
+		tail->pNext = p;
+		tail = tail->pNext;
 	}
-	lst.szList++;
-	return true;
+	size++;
 }
 
-bool insertTail(List& lst, const int& data)
-{
-	Node* p = createNode(data);
-	if (p == NULL) {
-		return false;
-	}
-	if (lst.head == NULL) {
-		lst.head = lst.tail = p;
-	}
-	else {
-		lst.tail->pNext = p;
-		lst.tail = lst.tail->pNext;
-	}
-	lst.szList++;
-	return true;
+Node* List::get_head() const {
+	return head;
+}
+
+int List::get_size() const {
+	return size;
+}
+
+void List::decreaseSize() {
+	size--;
+}
+
+void List::increaseSize() {
+	size++;
 }
