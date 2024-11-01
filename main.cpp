@@ -1,26 +1,26 @@
-#include <iostream>
+#include <stdio.h>
 #include "graph.h"
 
 int main(){
 	// Euler test
+	char Euler_graph[100];
+	printf("Nhap vao ten tap tin chua do thi Euler: ");
+	gets_s(Euler_graph);
 	printf("Bai toan duong di/ chu trinh Euler cho do thi sau:\n");
-	AdjencyList a("Euler_path.txt");
-	AdjencyList copy1(a);
+	AdjacencyList a(Euler_graph);
+	AdjacencyList copy1(a);
 	Euler e(&copy1);
 	e.Euler_Print();
 
+	getchar(); // Ignore '\n' character
 	// Hamilton test
+	char Ham_graph[100];
+	printf("Nhap vao ten tap tin chua do thi Hamilton: ");
+	gets_s(Ham_graph);
 	printf("Bai toan duong di/ chu trinh Hamilton cho do thi sau:\n");
-	AdjencyList b("hamilton_path.txt");
-	AdjencyList copy2(b);
+	AdjacencyList b(Ham_graph);
+	AdjacencyList copy2(b);
 	Hamilton h(&copy2);
 	h.Ham_print();
-	/*Euler test(&copy);
-	test.Euler_Print();*/
-	/*AdjencyMatrix test("test1.txt");
-	test.printGraph();
-	shortestPath sol;
-	sol.Dijkstra(test, 2);
-	sol.Bellman_Ford(test, 0);*/
 	return 0;
 }

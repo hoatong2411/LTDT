@@ -7,23 +7,26 @@
 
 typedef struct {
 	int u, v;
+	// u_pos , v_pos used to save the position of u (in linked list of v) 
+	// and v (in linked list of u)
 	int u_pos, v_pos;
 } Edge;
 
-class AdjencyList {
+class AdjacencyList {
 private:
 	std::vector<List*> lst;
 	int nVer;
 	friend class Euler;
 	friend class Hamilton;
+
 public:
-	friend void DFS_visit(AdjencyList* g, int ver, bool* label);
+	friend void DFS_visit(AdjacencyList* g, int ver, bool* label);
 	// Constructor & Destructor
-	AdjencyList(const char* filename);
-	~AdjencyList();
+	AdjacencyList(const char* filename);
+	~AdjacencyList();
 
 	// Copy constructor
-	AdjencyList(AdjencyList& org);
+	AdjacencyList(AdjacencyList& org);
 
 	// Function to load graph from file
 	void LoadGraph(const char* filename);
@@ -37,15 +40,16 @@ public:
 
 class Euler {
 private:
-	AdjencyList* Graph;
+	AdjacencyList* Graph;
 	int startVer;
-	int EulerType; // EulerType = 2 (circuit); = 1 (path); = 0 (none)
-	
+
+	// EulerType = 2 (circuit); = 1 (path); = 0 (none)
+	int EulerType; 
 public:
 	bool hasCircuit() const;
 	bool hasPath() const;
 	// Constructor
-	Euler(AdjencyList* g);
+	Euler(AdjacencyList* g);
 
 	// Operator with Edge
 	Edge removeEdge(int u, int v);
@@ -64,7 +68,7 @@ public:
 
 class Hamilton {
 private:
-	AdjencyList* Graph;
+	AdjacencyList* Graph;
 	int startVer;
 
 	// HamType = 2 (circuit); = 1 (path); = 0 (none)
@@ -77,9 +81,8 @@ private:
 public:
 	bool hasCircuit() const;
 	bool hasPath() const;
-	// Constructor and Destructor
-	Hamilton(AdjencyList* g);
-	~Hamilton();
+	// Constructor
+	Hamilton(AdjacencyList* g);
 
 	// Operator with Edge
 	Edge removeEdge(int u, int v);
@@ -88,11 +91,11 @@ public:
 
 	// Algorithm
 	bool isConnected();
-	void run();
-	void Hamiton_Rec(int pos, int val);
+	void Hamilton_Run();
+	void Hamilton_Rec(int pos, int val);
 
 	// Result
 	void Ham_print();
 };
 
-void DFS_visit(AdjencyList* g, int ver, bool* label);
+void DFS_visit(AdjacencyList* g, int ver, bool* label);
