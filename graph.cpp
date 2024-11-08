@@ -14,7 +14,7 @@ AdjacencyList::~AdjacencyList() {
 }
 
 // Copy constructor
-AdjacencyList::AdjacencyList(AdjacencyList& org) : nVer(org.nVer) {
+AdjacencyList::AdjacencyList(const AdjacencyList& org) : nVer(org.nVer) {
 	lst.resize(nVer);
 	for (int i = 0; i < nVer; i++) {
 		lst[i] = new List(*org.lst[i]);
@@ -24,24 +24,21 @@ AdjacencyList::AdjacencyList(AdjacencyList& org) : nVer(org.nVer) {
 // Function to to load graph from .txt file 
 void AdjacencyList::LoadGraph(const char* filename) {
 	FILE* fp = NULL;
-	errno_t err = fopen_s(&fp, filename, "r");
-	if (err != 0) {
+	if (fopen_s(&fp, filename, "r") != 0 || !fp) {
 		exit(1);
 	}
 
 	// Read nVer
 	fscanf_s(fp, "%d\n", &nVer);
-	lst.resize(nVer);
+	lst.resize(nVer, NULL);
 	for (int i = 0; i < nVer; i++) {
 		lst[i] = new List();
 	}
 
 	// Parse input
 	char line[200];
-	int i = 0;
-	while (fgets(line, sizeof(line), fp)) {
+	for (int i = 0; i < nVer && fgets(line, sizeof(line), fp); i++) {
 		char* context = nullptr;
-
 		// Extract number of vertexs connect to this vertex
 		char* p = strtok_s(line, " ", &context);
 
@@ -49,22 +46,21 @@ void AdjacencyList::LoadGraph(const char* filename) {
 		while ((p = strtok_s(NULL, " ", &context)) != NULL) {
 			lst[i]->push_back(atoi(p));
 		}
-		i++;
 	}
 	fclose(fp);
 }
 
 
-void AdjacencyList::printGraph() {
-	printf("nVer: %d\n", nVer);
+void AdjacencyList::printGraph() const {
+	printf("Number of vertices: %d\n", nVer);
 	for (int i = 0; i < nVer; i++) {
-		printf("Point %d: ", i);
+		printf("Vertex %d: ", i);
 		Node* p = lst[i]->get_head();
-		while (p != NULL) {
+		while (p) {
 			printf("%d ", p->data);
 			p = p->pNext;
 		}
-		printf("\t\tNumber of vertexs: %d\n", lst[i]->get_size());
+		printf("\n");
 	}
 	printf("\n");
 }
@@ -82,7 +78,7 @@ List* AdjacencyList::operator[](int index) {
 
 // Euler constructor
 Euler::Euler(AdjacencyList* g) : Graph(g) {
-	(*g).printGraph();
+	Graph->printGraph();
 	printf("Nhap dinh bat dau: ");
 	scanf_s("%d", &startVer);
 	EulerType = checkEulerGraph(startVer);
@@ -167,14 +163,18 @@ void Euler::addEdge(int u, int v, Edge e) {
 // An Eulerian graph with isolated vertices can still be connected, 
 // but a Hamiltonian graph cannot.
 bool Euler::isConnected() {
+	if (Graph->nVer == 1) {
+		return true;
+	}
+
 	// Initialize an array to check that a vertex is visited or not
 	bool* label = new bool[Graph->nVer];
-	memset(label, false, Graph->nVer * sizeof(bool));
+	memset(label, 0, Graph->nVer * sizeof(bool));
 
 	// Find a non-isolated vertex to run DFS
 	int DFS_startVer = -1;
 	for (int i = 0; i < Graph->nVer; i++) {
-		if ((*Graph)[i]->get_size() != 0) {
+		if ((*Graph)[i]->get_size() > 0) {
 			DFS_startVer = i;
 			break;
 		}
@@ -190,12 +190,11 @@ bool Euler::isConnected() {
 	DFS_visit(Graph, DFS_startVer, label);
 	for (int j = 0; j < Graph->nVer; j++) {
 		// If exists a vertex with positive degree but cannot be reachable -> not connected
-		if (label[j] == false && (*Graph)[j]->get_size() != 0) {
+		if (label[j] == false && (*Graph)[j]->get_size() > 0) {
 			connect = false;
 			break;
 		}
 	}
-
 	delete[]label;
 	return connect;
 }
@@ -248,7 +247,7 @@ int Euler::checkEulerGraph(int startVer) {
 bool Euler::isBrigde(int u, int v) {
 	// Label array to check a vertex is visited or not
 	bool* label = new bool[Graph->nVer];
-	memset(label, false, Graph->nVer * sizeof(bool));
+	memset(label, 0, Graph->nVer * sizeof(bool));
 
 	// Count vertex reachable from u before remove edge {u,v}
 	int countBefore = DFS_Count(u, label);
@@ -400,7 +399,7 @@ void Hamilton::addEdge(int u, int v, Edge e) {
 }
 
 // Function to check 2 vertexs are adjacency vertexs
-bool Hamilton::isEdge(int u, int v) {
+bool Hamilton::isEdge(int u, int v) const {
 	Node* p = (*Graph)[u]->get_head();
 	while (p != NULL) {
 		if (p->data == v) {
@@ -422,7 +421,7 @@ bool Hamilton::isConnected() {
 
 	// Initialize an array to check that a vertex is visited or not
 	bool* label = new bool[Graph->nVer];
-	memset(label, false, Graph->nVer * sizeof(bool));
+	memset(label, 0, Graph->nVer * sizeof(bool));
 
 	// If exists an isolated vertex -> not connected
 	for (int i = 0; i < Graph->nVer; i++) {
@@ -452,7 +451,7 @@ void Hamilton::Hamilton_Run() {
 	scanf_s("%d", &startVer);
 
 	if (!isConnected()) {
-		printf("Do thi khong lien thong nen khong the tim duoc duong di/chu trinh Hamilton\n");
+		printf("Khong the tim duoc duong di/chu trinh Hamilton\n");
 		return;
 	}
 
@@ -462,7 +461,7 @@ void Hamilton::Hamilton_Run() {
 	
 	Node* p = (*Graph)[curPath[0]]->get_head();
 	while (p != NULL) {
-		Hamilton_Rec(pos, p->data);
+		Hamiton_Rec(pos, p->data);
 		p = p->pNext;
 	}
 }
@@ -479,7 +478,7 @@ void Hamilton::Hamilton_Run() {
 // 3. if array has nVer elements (by recursion) -> path/ circuit
 // - if a[nVer - 1] and a[0] are connected -> Circuit
 // - otherwise -> path
-void Hamilton::Hamilton_Rec(int pos, int val) {
+void Hamilton::Hamiton_Rec(int pos, int val) {
 	curPath[pos] = val;
 	if (!isEdge(curPath[pos - 1], curPath[pos])) {
 		return;
@@ -495,12 +494,12 @@ void Hamilton::Hamilton_Rec(int pos, int val) {
 		}
 	}
 
+	// Case forms a circuit
 	if (pos == Graph->nVer - 1) {
-		// Case forms a circuit
-		if (isEdge(curPath[0], curPath[pos])) {
+		if (isEdge(curPath[0], curPath[pos])) {// Circuit
 			circuit.push_back(curPath);
 		}
-		else {
+		else {// Path
 			path.push_back(curPath);
 		}
 		addEdge(curPath[pos - 1], curPath[pos], e);
@@ -511,7 +510,7 @@ void Hamilton::Hamilton_Rec(int pos, int val) {
 	Node* p = (*Graph)[curPath[pos]]->get_head();
 	while (p != NULL) {
 		if (p->data >= 0) {
-			Hamilton_Rec(pos + 1, p->data);
+			Hamiton_Rec(pos + 1, p->data);
 		}
 		p = p->pNext;
 	}
@@ -521,7 +520,7 @@ void Hamilton::Hamilton_Rec(int pos, int val) {
 // Print Hamilton path/circuit
 void Hamilton::Ham_print() {
 	if (hasCircuit()) {
-		printf("Chu trinh Hamilton xuat phat tu dinh %d:\n", curPath[0]);
+		printf("Chu trinh Hamilton xuat phat tu dinh %d:\n", startVer);
 		// Print all circuit
 		for (int i = 0; i < circuit.size(); i++) {
 			printf("%d ", circuit[i][0]);
@@ -533,12 +532,12 @@ void Hamilton::Ham_print() {
 		return;
 	}
 	if (hasPath()) {
-		printf("Duong di Hamilton xuat phat tu dinh %d:\n", curPath[0]);
-		// Print all circuit
-		for (int i = 0; i < circuit.size(); i++) {
-			printf("%d ", circuit[i][0]);
+		printf("Duong di Hamilton xuat phat tu dinh %d:\n", startVer);
+		// Print all path
+		for (int i = 0; i < path.size(); i++) {
+			printf("%d ", path[i][0]);
 			for (int j = 1; j < Graph->nVer; j++) {
-				printf("-> %d ", circuit[i][j]);
+				printf("-> %d ", path[i][j]);
 			}
 			printf("\n");
 		}
